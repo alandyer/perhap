@@ -27,7 +27,7 @@ defmodule Perhap.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :cowboy, :libcluster, :swarm]]
+    [applications: [:logger, :cowboy, :libcluster, :swarm, :ex_aws, :hackney, :poison]]
   end
 
   defp deps do
@@ -40,7 +40,10 @@ defmodule Perhap.Mixfile do
      {:libcluster, "~> 2.1"},
      {:swarm, "~> 3.0"},
      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
-     {:ex_doc, "~> 0.15.0", only: :dev, runtime: false}]
+     {:ex_doc, "~> 0.15.0", only: :dev, runtime: false},
+     {:ex_aws, "~> 1.0"},
+     {:hackney, "~> 1.6"}
+    ]
      # {:ranch, github: "ninenines/ranch", ref: "1.4.0", override: true},
      # {:gun, github: "ninenines/gun", ref: "1.0.0-pre.3", runtime: false},
      # {:snappy, github: "fdmanana/snappy-erlang-nif"},
