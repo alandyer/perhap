@@ -12,17 +12,24 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
   def put_event(event) do
     ExAws.Dynamo.put_item("Events", event)
     |> ExAws.request!
+
+    :ok
   end
 
   def get_event(event_id) do
     dynamo_object = ExAws.Dynamo.get_item("Events", %{event_id: event_id})
     |> ExAws.request!
 
-    metadata = ExAws.Dynamo.decode_item(Map.get(dynamo_object, "Item") |> Map.get("metadata"), as: Perhap.Event.Metadata)
+    case dynamo_object do
+      %{"Item" => data} ->
+        metadata = ExAws.Dynamo.decode_item(Map.get(dynamo_object, "Item") |> Map.get("metadata"), as: Perhap.Event.Metadata)
 
-    event = ExAws.Dynamo.decode_item(dynamo_object, as: Perhap.Event)
+        event = ExAws.Dynamo.decode_item(dynamo_object, as: Perhap.Event)
 
-    %Perhap.Event{event | metadata: metadata}
+        %Perhap.Event{event | metadata: metadata}
+      %{} ->
+        {:error, "Event not found"}
+    end
   end
 
   def get_events(context, opts \\ []) do
