@@ -1,8 +1,24 @@
 use Mix.Config
 
 config :perhap,
-  eventstore: Perhap.Adapters.Eventstore.Memory,
+  eventstore: Perhap.Adapters.Eventstore.Dynamo,
   modelstore: Perhap.Adapters.Modelstore.Memory
+
+config :ex_aws,
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role]
+
+config :ex_aws, :retries,
+  max_attempts: 10,
+  base_backoff_in_ms: 10,
+  max_backoff_in_ms: 10_000
+
+config :ex_aws, :dynamodb,
+  scheme: "http://",
+  host: "localhost",
+  port: 8000,
+  region: "us-east-1"
+
 
 config :ssl, protocol_version: :"tlsv1.2"
 

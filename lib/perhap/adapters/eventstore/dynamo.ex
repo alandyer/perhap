@@ -10,14 +10,19 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
   end
 
   def put_event(event) do
-    event2 = %Perhap.Event{event | metadata: Map.from_struct(event.metadata)}
-    ExAws.Dynamo.put_item("Events", Map.from_struct(event2))
+    ExAws.Dynamo.put_item("Events", event)
     |> ExAws.request!
   end
 
   def get_event(event_id) do
-    ExAws.Dynamo.get_item("Events", %{event_id: event_id})
+    dynamo_object = ExAws.Dynamo.get_item("Events", %{event_id: event_id})
     |> ExAws.request!
+
+    metadata = ExAws.Dynamo.decode_item(Map.get(dynamo_object, "Item") |> Map.get("metadata"), as: Perhap.Event.Metadata)
+
+    event = ExAws.Dynamo.decode_item(dynamo_object, as: Perhap.Event)
+
+    %Perhap.Event{event | metadata: metadata}
   end
 
   def get_events(context, opts \\ []) do
