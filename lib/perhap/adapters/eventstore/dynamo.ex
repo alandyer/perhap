@@ -13,7 +13,18 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
     ExAws.Dynamo.put_item("Events", %{Map.from_struct(event) | metadata: Map.from_struct(event.metadata)})
     |> ExAws.request!
 
-    ExAws.Dynamo.put_item("Index", %{context: event.metadata.context, entity_id: event.metadata.entity_id, event_id: event.event_id})
+    dynamo_object = ExAws.Dynamo.get_item("Index", %{context: event.metadata.context, entity_id: event.metadata.entity_id})
+    |> ExAws.request!
+
+    indexed_events = case dynamo_object do
+      %{"Item" => data} ->
+        Map.get(data, "events") |> ExAws.Dynamo.Decoder.decode
+      %{} ->
+        []
+    end
+    #IO.inspect indexed_events
+
+    ExAws.Dynamo.put_item("Index", %{context: event.metadata.context, entity_id: event.metadata.entity_id, events: [event.event_id | indexed_events]})
     |> ExAws.request!
 
     :ok
