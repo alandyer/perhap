@@ -2,6 +2,9 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
   use Perhap.Adapters.Eventstore
   use GenServer
 
+  #@derive [ExAws.Dynamo.Encodable]
+  #defstruct [:event]
+
   #alias __MODULE__
 
 
@@ -35,12 +38,13 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
     |> ExAws.request!
 
     case dynamo_object do
-      %{"Item" => data} ->
-        metadata = ExAws.Dynamo.decode_item(Map.get(data, "metadata"), as: Perhap.Event.Metadata)
+      %{"Item" => result} ->
+        metadata = ExAws.Dynamo.decode_item(Map.get(result, "metadata"), as: Perhap.Event.Metadata)
+        #data = ExAws.Dynamo.Decoder.decode(Map.get(result, "data"))
 
         event = ExAws.Dynamo.decode_item(dynamo_object, as: Perhap.Event)
 
-        %Perhap.Event{event | metadata: metadata}
+        %Perhap.Event{event | metadata: metadata, data: data}
       %{} ->
         {:error, "Event not found"}
     end

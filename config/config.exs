@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :perhap,
-  eventstore: Perhap.Adapters.Eventstore.Dynamo,
+  eventstore: Perhap.Adapters.Eventstore.Memory,
   modelstore: Perhap.Adapters.Modelstore.Memory
 
 config :ex_aws,
@@ -14,9 +14,7 @@ config :ex_aws, :retries,
   max_backoff_in_ms: 10_000
 
 config :ex_aws, :dynamodb,
-  scheme: "http://",
-  host: "localhost",
-  port: 8000,
+  scheme: "https://",
   region: "us-east-1"
 
 

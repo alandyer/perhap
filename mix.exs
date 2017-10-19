@@ -27,7 +27,9 @@ defmodule Perhap.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :cowboy, :libcluster, :swarm, :ex_aws, :hackney, :poison]]
+    [applications: [:logger, :cowboy, :libcluster, :swarm],
+     extra_applications: [:ex_aws, :hackney, :poison]]
+
   end
 
   defp deps do
