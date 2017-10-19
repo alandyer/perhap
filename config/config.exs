@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :perhap,
-  eventstore: Perhap.Adapters.Eventstore.Memory,
+  eventstore: Perhap.Adapters.Eventstore.Dynamo,
   modelstore: Perhap.Adapters.Modelstore.Memory
 
 config :ex_aws,

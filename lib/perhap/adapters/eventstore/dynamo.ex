@@ -44,7 +44,7 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
 
         event = ExAws.Dynamo.decode_item(dynamo_object, as: Perhap.Event)
 
-        %Perhap.Event{event | metadata: metadata, data: data}
+        %Perhap.Event{event | metadata: metadata}
       %{} ->
         {:error, "Event not found"}
     end
@@ -63,8 +63,15 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
             {:error, "Event not Found"}
         end
       _ ->
-        dynamo_object = ExAws.Dynamo.query("Index", [key_condition_expression: "context = #{context}"])
-        |> ExAws.request! |> ExAws.Dynamo.decode_item
+        dynamo_object = ExAws.Dynamo.query("Index",
+                                           expression_attribute_values: [context: context],
+                                           key_condition_expression: "context = :context")
+                        |> ExAws.request!
+                        |> Map.get("Items")
+                        |> Enum.map(fn x -> ExAws.Dynamo.Decoder.decode(x) end)
+                        |> Enum.map(fn x -> Map.get(x, "events") end)
+                        |> List.flatten
+
     end
 
     event_ids2 = case Keyword.has_key?(opts, :after) do
@@ -74,8 +81,14 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
       _ -> event_ids
     end
 
+    event_ids3 = for event_id <- event_ids2, do: [event_id: event_id]
     #possible this can only do 100 at a time, run through a loop if more
-    events = ExAws.Dynamo.batch_get_item(%{"Events" => [keys: event_ids2]})
+    events = ExAws.Dynamo.batch_get_item(%{"Events" => [keys: event_ids3]})
+             |> ExAws.request!
+             |> Map.get("Responses")
+             |> Map.get("Events")
+             |> Enum.map(fn event -> {event, ExAws.Dynamo.decode_item(event["metadata"], as: Perhap.Event.Metadata)} end)
+             |> Enum.map(fn {event, metadata} -> %Perhap.Event{ExAws.Dynamo.decode_item(event, as: Perhap.Event) | metadata: metadata} end)
     {:ok, events}
   end
 
@@ -84,5 +97,10 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
       true -> maybe_uuidv1
       _ -> maybe_uuidv1 |> Perhap.Event.uuid_v1_to_time_order
     end
+  end
+
+  defp decode_data(data) do
+    Enum.reduce(data, %{}, fn({key, value}, map) ->
+      Map.put(map, String.to_atom(key), value) end)
   end
 end

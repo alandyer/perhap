@@ -52,7 +52,7 @@ defmodule PerhapTest.Helper do
     event_id = metadata.event_id || Perhap.Event.get_uuid_v1()
     %Perhap.Event{
       event_id: event_id,
-      data: %{:random_number => :rand.uniform(1000)},
+      data: %{"random_number" => :rand.uniform(1000)},
       metadata: %{
         metadata |
           event_id: event_id,

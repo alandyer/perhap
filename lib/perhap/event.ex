@@ -33,7 +33,6 @@ defmodule Perhap.Event.UUIDv4 do
 end
 
 defmodule Perhap.Event do
-
   @type t :: %__MODULE__{ event_id: Perhap.Event.UUIDv1.t,
                           data: map(),
                           metadata: Perhap.Event.Metadata.t }
@@ -96,7 +95,7 @@ defmodule Perhap.Event do
   # Timestamps and unique integers
   @spec timestamp() :: integer
   def timestamp(), do: System.system_time(:microseconds)
-  
+
   @spec unique_integer() :: integer
   def unique_integer(), do: System.unique_integer([:monotonic])
 
