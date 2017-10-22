@@ -43,7 +43,7 @@ defmodule Perhap.Mixfile do
      {:swarm, "~> 3.0"},
      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
      {:ex_doc, "~> 0.15.0", only: :dev, runtime: false},
-     {:ex_aws, "~> 1.0"},
+     {:ex_aws, "~> 1.1.5"},
      {:hackney, "~> 1.6"}
     ]
      # {:ranch, github: "ninenines/ranch", ref: "1.4.0", override: true},

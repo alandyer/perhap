@@ -2,7 +2,7 @@ defmodule Perhap.Adapters.Eventstore.Dynamo do
   use Perhap.Adapters.Eventstore
   use GenServer
 
-  #@derive [ExAws.Dynamo.Encodable]
+  @derive [ExAws.Dynamo.Encodable]
   #defstruct [:event]
 
   #alias __MODULE__
